@@ -1,14 +1,122 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  background: #f8f8f8;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.page-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 80%;
+  margin: 50px auto;
 }
 
 .container {
   width: 60%;
-  margin: auto;
   background: white;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+table th {
+  background: #1d1d1d;
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+table td {
+  background: white;
+}
+table input[type=number] {
+  width: 50px;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.checkout-panel {
+  width: 35%;
+  background: #1d1d1d;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: left;
+}
+
+button, .continue-shopping {
+  background: #f54d27;
+  color: white;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.3s;
+}
+button:hover, .continue-shopping:hover {
+  background: rgb(222.6902654867, 49.4867256637, 10.3097345133);
+}
+
+.proceed-checkout {
+  background: #ff4500;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  text-align: center;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+.proceed-checkout:hover {
+  background: rgb(204, 55.2, 0);
+}
+
+@media (max-width: 900px) {
+  .page-container {
+    flex-direction: column;
+    width: 95%;
+  }
+  .container {
+    width: 100%;
+    padding: 15px;
+  }
+  .checkout-panel {
+    width: 100%;
+    float: none;
+    margin-top: 20px;
+  }
+  table {
+    font-size: 14px;
+  }
+  input[type=number] {
+    width: 40px;
+  }
+  button {
+    width: 100%;
+    font-size: 14px;
+  }
 }
 
 /*# sourceMappingURL=style.css.map */
