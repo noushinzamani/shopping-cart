@@ -4,17 +4,6 @@ A simple **PHP-based shopping cart** that allows users to adjust item quantities
 
 ---
 
-## 📌 Features
-✅ Add/Edit product quantities  
-✅ Stores cart data in **MySQL database**  
-✅ Maintains session state for users  
-✅ **AJAX updates** (no page reloads)  
-✅ Calculates **GST (5%) & QST (9.975%)**  
-✅ No external CSS libraries, only **SCSS**  
-✅ Secure **PDO database connection**
-
----
-
 ## 🔧 Installation Guide
 ### **1️⃣ Prerequisites**
 - **XAMPP (Apache + MySQL + PHP 8)** → [Download Here](https://www.apachefriends.org/index.html)
