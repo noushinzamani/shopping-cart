@@ -1,60 +1,51 @@
 <?php
-require_once '../Cart.php';
-header('Content-Type: application/json');
+require '../config.php';
 
-$cart = new Cart();
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $items = $cart->getItems();
-
-    // Calculate subtotal
-    $subtotal = 0;
-    foreach ($items as $item) {
-        $subtotal += $item['price'] * $item['quantity'];
-    }
-
-    // Calculate taxes
-    $GST = $subtotal * 0.05; // 5% GST
-    $QST = $subtotal * 0.09975; // 9.975% QST
-    $grandTotal = $subtotal + $GST + $QST; // Final total
-
-    // Send structured response
-    echo json_encode([
-        "items" => $items,
-        "subtotal" => number_format($subtotal, 2, '.', ''),
-        "GST" => number_format($GST, 2, '.', ''),
-        "QST" => number_format($QST, 2, '.', ''),
-        "grandTotal" => number_format($grandTotal, 2, '.', '')
-    ]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle POST request to update quantity
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
+    if (isset($data['id']) && isset($data['quantity'])) {
+        $id = intval($data['id']);
+        $quantity = intval($data['quantity']);
 
-    if (isset($data['id']) && isset($data['quantity']) && $data['quantity'] >= 0) {
-        if ($cart->updateQuantity($data['id'], $data['quantity'])) {
-            // Fetch updated cart data after update
-            $items = $cart->getItems();
-            $subtotal = 0;
-            foreach ($items as $item) {
-                $subtotal += $item['price'] * $item['quantity'];
-            }
-
-            $GST = $subtotal * 0.05;
-            $QST = $subtotal * 0.09975;
-            $grandTotal = $subtotal + $GST + $QST;
-
-            echo json_encode([
-                "status" => "success",
-                "items" => $items,
-                "subtotal" => number_format($subtotal, 2, '.', ''),
-                "GST" => number_format($GST, 2, '.', ''),
-                "QST" => number_format($QST, 2, '.', ''),
-                "grandTotal" => number_format($grandTotal, 2, '.', '')
-            ]);
+        if ($quantity > 0) {
+            $stmt = $conn->prepare("UPDATE cart_items SET quantity = ? WHERE id = ?");
+            $stmt->bind_param("ii", $quantity, $id);
+            $stmt->execute();
+            $stmt->close();
         } else {
-            echo json_encode(["status" => "error", "message" => "Failed to update quantity."]);
+            $stmt = $conn->prepare("DELETE FROM cart_items WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
         }
-    } else {
-        echo json_encode(["status" => "error", "message" => "Invalid input data."]);
     }
 }
+
+// Fetch cart items
+$result = $conn->query("SELECT id, product_name, price, quantity FROM cart_items");
+$cartItems = [];
+$subtotal = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $row['price'] = $row['price'] * $row['quantity']; // Update price based on quantity
+    $subtotal += $row['price'];
+    $cartItems[] = $row;
+}
+
+$GST = round($subtotal * 0.05, 2);
+$QST = round($subtotal * 0.09975, 2);
+$grandTotal = round($subtotal + $GST + $QST, 2);
+
+// Return JSON response
+echo json_encode([
+    "status" => "success",
+    "items" => $cartItems,
+    "subtotal" => number_format($subtotal, 2),
+    "GST" => number_format($GST, 2),
+    "QST" => number_format($QST, 2),
+    "grandTotal" => number_format($grandTotal, 2)
+]);
+
+$conn->close();
 ?>

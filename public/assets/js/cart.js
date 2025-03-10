@@ -5,11 +5,13 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("/shopping-cart/src/api/cart.php")
             .then(response => response.json())
             .then(data => {
-                console.log("Cart API Response:", data);
+                console.log("Cart API Response:", data); // Debugging
 
                 let cartContainer = document.getElementById("cart");
-                if (!cartContainer) {
-                    console.error("Cart container not found.");
+                let cartSummary = document.querySelector(".checkout-panel");
+
+                if (!cartContainer || !cartSummary) {
+                    console.error("Cart elements not found in HTML.");
                     return;
                 }
 
@@ -17,6 +19,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (!data.items || data.items.length === 0) {
                     cartHtml = "<p>No items in cart.</p>";
+                    cartSummary.innerHTML = `
+                        <p>Subtotal: $0.00</p>
+                        <p>GST (5%): $0.00</p>
+                        <p>QST (9.975%): $0.00</p>
+                        <strong>Grand Total: $0.00</strong>
+                    `;
                 } else {
                     cartHtml += `<table>
                                     <tr>
@@ -26,35 +34,35 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </tr>`;
 
                     data.items.forEach(item => {
-                        cartHtml += `<tr>
+                        cartHtml += `<tr data-id="${item.id}" class="cart-item">
                             <td>${item.product_name}</td>
-                            <td>$${item.price}</td>
+                            <td class="price">$${parseFloat(item.price).toFixed(2)}</td>
                             <td>
-                                <input type="number" value="${item.quantity}" data-id="${item.id}" class="quantity-input" min="0">
+                                <input type="number" value="${item.quantity}" data-id="${item.id}" class="quantity-input" min="1">
                             </td>
                         </tr>`;
                     });
 
                     cartHtml += `</table>`;
+
+                    cartSummary.innerHTML = `
+                        <p>Subtotal: $${data.subtotal}</p>
+                        <p>GST (5%): $${data.GST}</p>
+                        <p>QST (9.975%): $${data.QST}</p>
+                        <strong>Grand Total: $${data.grandTotal}</strong>
+                    `;
                 }
 
                 cartContainer.innerHTML = cartHtml;
 
-                // Update the summary
-                document.getElementById("subtotal").innerHTML = `Subtotal: $${data.subtotal}`;
-                document.getElementById("GST").innerHTML = `GST (5%): $${data.GST}`;
-                document.getElementById("QST").innerHTML = `QST (9.975%): $${data.QST}`;
-                document.getElementById("grandTotal").innerHTML = `<strong>Grand Total: $${data.grandTotal}</strong>`;
-
-                // Attach event listeners to quantity inputs
                 document.querySelectorAll(".quantity-input").forEach(input => {
                     input.addEventListener("change", function () {
                         let newQuantity = parseInt(this.value);
                         let productId = this.dataset.id;
 
-                        if (isNaN(newQuantity) || newQuantity < 0) {
-                            this.value = 0; // Set to 0 if invalid
-                            newQuantity = 0;
+                        if (isNaN(newQuantity) || newQuantity < 1) {
+                            this.value = 1;
+                            newQuantity = 1;
                         }
 
                         updateQuantity(productId, newQuantity);
@@ -73,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
-                fetchCart(); // Refresh the cart after update
+                fetchCart();
             } else {
                 alert("Error updating cart: " + data.message);
             }
