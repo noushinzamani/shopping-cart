@@ -7,6 +7,6 @@ CREATE TABLE cart (
 );
 
 INSERT INTO cart (product_name, price, quantity) VALUES
-('Laptop', 1200.00, 2),
+('Laptop', 1200.00, 1),
 ('Mouse', 25.00, 1),
-('Keyboard', 50.00, 81);
+('Keyboard', 50.00, 1);
